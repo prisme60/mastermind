@@ -96,6 +96,8 @@ namespace dbclient
 		char msg[MSG_ARRAY_SIZE];
 		int length = command.size();
 		
+		cerr << command;
+		
 		assert(length<MSG_ARRAY_SIZE);
 		if(length<MSG_ARRAY_SIZE)
 		{
@@ -126,6 +128,7 @@ namespace dbclient
 					//cout << "Message traité : " << msg << "\n";
 					result = msg;
 					bResult = true;
+					cerr << "//" << result << endl;
 				}
 			}
 			else {

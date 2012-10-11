@@ -62,7 +62,7 @@ vectorCombinaison* MasterSolver::solve()
   while((solutionSetSize=UpdateSolutionSet())>1)
   {
     //Check if the pattern jhas been already compute for this correction! 
-    NodeCombinaison *pNodeCombi =  m_pCurrentNodeCombinaison->getNodeCombinaisonForScore(mCONVERT_SCORE_TO_LOCALSCORE(blackPigs,whitePigs));
+    NodeCombinaison *pNodeCombi =  m_pCurrentNodeCombinaison->getNodeCombinaisonForScore(m_nbColors, mCONVERT_SCORE_TO_LOCALSCORE(blackPigs,whitePigs));
     
     if(pNodeCombi!=NULL && pNodeCombi->getCombinaison()!=NULL)
     {//the NodeCombi was already previously computed!
@@ -73,7 +73,7 @@ vectorCombinaison* MasterSolver::solve()
     {//the combi was not already computed
       guessNextPattern(combi,solutionSetSize>MIN_SOLUTIONSET_SIZE_FOR_FASTSEARCH);//it is possible to use combi because it has been saved in the m_pastGuessSet vector
       //we keep the computed combi for the next resolution. We store it into the NodeCombinaison
-      if(m_pCurrentNodeCombinaison->addCombinaison(combi,mCONVERT_SCORE_TO_LOCALSCORE(blackPigs,whitePigs),m_pCurrentNodeCombinaison)==false)
+      if(m_pCurrentNodeCombinaison->addCombinaison(m_nbColors,combi,mCONVERT_SCORE_TO_LOCALSCORE(blackPigs,whitePigs),m_pCurrentNodeCombinaison)==false)
       {
         cout << "An error occur #1 on combi " << combi << " NodeLevel=" << m_pCurrentNodeCombinaison->getLevel() << "\n";
         exit(50);
@@ -94,7 +94,7 @@ vectorCombinaison* MasterSolver::solve()
     //cout << "Correction for combinaison: " << m_possibleSolutionSet.front() << "is [4,0]\n";
     if(m_possibleSolutionSet.size()>0)
     {
-      if(m_pCurrentNodeCombinaison->addCombinaison(m_possibleSolutionSet.front(),mCONVERT_SCORE_TO_LOCALSCORE(blackPigs,whitePigs),m_pCurrentNodeCombinaison)==false)
+      if(m_pCurrentNodeCombinaison->addCombinaison(m_nbColors, m_possibleSolutionSet.front(),mCONVERT_SCORE_TO_LOCALSCORE(blackPigs,whitePigs),m_pCurrentNodeCombinaison, true)==false)
       {
 #ifndef NO_RESULT_OUTPUT
         cout << "An error occur #2 on combi " << combi << " NodeLevel=" << m_pCurrentNodeCombinaison->getLevel() << " SetSize=" << m_possibleSolutionSet.size();

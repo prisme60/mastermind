@@ -57,21 +57,24 @@ public:
 
     void setCombinaison(const Combinaison &combinaison);//set the combinaison of the node
     const Combinaison* getCombinaison() const;//get the combinaison of the node
-    NodeCombinaison* getNodeCombinaisonForScore(tLocalScore localScore);//get the combinaison of the child node corresponding to the score
-    bool addCombinaison(const Combinaison &combi, tLocalScore localScore, NodeCombinaison *&newNodeCombinaison);//return false, if the combinaison already exist and it is different from the new combinaison
+    NodeCombinaison* getNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore);//get the combinaison of the child node corresponding to the score
+    bool addCombinaison(U32 nbColors, const Combinaison &combi, tLocalScore localScore, NodeCombinaison *&newNodeCombinaison, bool storeIntoDB=false);//return false, if the combinaison already exist and it is different from the new combinaison
 
     //TODO add a dot output script for graph generation
 	bool buildDotFile(const char* fileName);
 	
 	#ifdef _DB_VIA_UDP_
-	NodeCombinaison* retrieveNodeCombinaisonForScore(tLocalScore localScore);
-	bool retrieveCombinaisonForScore(tLocalScore localScore, string &result);
+	NodeCombinaison* retrieveNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore);
+	bool retrieveCombinaisonForScore(U32 nbColors, tLocalScore localScore, string &result);
+	bool storeCombinaison(U32 nbColors, string &result);
 	
 	static string& buildScoreString(tLocalScore localScore, string &sScore);
 	static stringstream& buildScoreString(tLocalScore localScore, stringstream &ssScore);
 
 	void buildScorePath(string &sScorepath);
 	stringstream& buildScorePath(stringstream &ssScorePath);
+	
+	stringstream& buildCombiScorePath(stringstream &ssScorePath);
 	
 	#endif //_DB_VIA_UDP_
 

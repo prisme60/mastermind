@@ -56,6 +56,8 @@ public:
     bool isCombinaisonCompatible(const Combinaison &combiToTest, U32 wantedBlackPigs, U32 wantedWhitePigs) const;
 	
     void random(tColor nbColor);
+	
+	inline U32 getNbPositions() {return m_nbElements;}
 
     friend ostream& operator<<(ostream& os, const Combinaison& combinaison)
     {
