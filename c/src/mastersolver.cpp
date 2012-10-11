@@ -275,7 +275,6 @@ void MasterSolver::guessNextPattern(Combinaison &nextPatternCombi, bool bFastSea
 }
 
 #if NUMBER_OF_THREADS <= 1
-__INLINE__
 void MasterSolver::updateFromIteration(const Combinaison &guessComb, U32 &maximumGuessScore, Combinaison &nextPatternCombi)
 {
       U32 thisScore = testCurrentPattern(guessComb);
@@ -354,7 +353,6 @@ void MasterSolver::updateFromIterationMT_init()
 	m_MTmaximumGuessScore=0;
 }
 
-__INLINE__
 void MasterSolver::updateFromIterationMT_emit(const Combinaison &guessComb)
 {
 	//D_BEGIN cerr << "MT # EMIT BEGIN" << endl; D_END
@@ -558,7 +556,6 @@ void MasterSolver::buildScoreSet()
 /**
 *Score is corresponding to the correction#include "combinaison.h"
 */
-__INLINE__
 U32  MasterSolver::countRemovals(const Combinaison &guessCombinaison,tScore &score)
 {
   U32 count = 0;

@@ -69,15 +69,15 @@ public:
     bool isCombiCompatible(Combinaison &givenTestedCombinaison, Combinaison &combinaisonToTest,tScore &score);
     U32  UpdateSolutionSet();
     void guessNextPattern(Combinaison &nextPatternCombi, bool bFastSearch);
-	__INLINE__ void updateFromIteration(const Combinaison &guessComb, U32 &maximumGuessScore, Combinaison &nextPatternCombi);
+	void updateFromIteration(const Combinaison &guessComb, U32 &maximumGuessScore, Combinaison &nextPatternCombi);
     U32  testCurrentPattern(const Combinaison &currentGuessPattern);
     void buildScoreSet();
-    __INLINE__ U32  countRemovals(const Combinaison &guessCombinaison,tScore &score);
+    U32  countRemovals(const Combinaison &guessCombinaison,tScore &score);
 	
 #if NUMBER_OF_THREADS > 1
 	void createThreads();
 	void destroyThreads();
-	__INLINE__ void updateFromIterationMT_emit(const Combinaison &guessComb);
+	void updateFromIterationMT_emit(const Combinaison &guessComb);
 	void updateFromIterationMT_init();
 	void updateFromIterationMT_end(Combinaison &nextPatternCombi);
 	void* updateFromIterationWT(void *t);

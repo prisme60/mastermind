@@ -24,9 +24,6 @@
 #ifndef LABYTYPEDEFINITION_H
 #define LABYTYPEDEFINITION_H
 
-namespace mastermind
-{
-
 typedef bool		U1;
 typedef unsigned char	U8;
 typedef unsigned short	U16;
@@ -42,8 +39,8 @@ typedef long	S32;
 
 #define mLibAssert(boolVal) while(!boolVal);
 
-//#define __INLINE__ __attribute__((always_inline)) inline
-#define __INLINE__
+namespace mastermind
+{
 
 typedef struct{
 U32 blackPigs;
