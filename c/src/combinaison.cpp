@@ -10,8 +10,11 @@
 //
 //
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
+#include <sstream>
+
 #include "combinaison.h"
 
 namespace mastermind {
@@ -36,11 +39,55 @@ m_nbElements(0)
   *this = combi;//operator= overload
 }
 
+Combinaison::Combinaison (string combiString)
+{
+	cerr << "Construct Combinaison from string: " << combiString << endl;
+#ifdef COMBINAISON_DYNAMIC_ALLOCATION
+	//NEED TO BE TESTED
+	U32 nbOfCommas = count(combiString.begin(), combiString.end(), ',');//determine the number of elements required for the allocation
+	m_pColorTable = new tColor[nbOfCommas + 1];
+	//TODO
+#endif// COMBINAISON_DYNAMIC_ALLOCATION
+	stringstream ss(combiString);
+	m_nbElements = 0;
+#ifdef COMBINAISON_DYNAMIC_ALLOCATION
+	for(int i=0;i<nbOfCommas + 1;i++)
+#else // COMBINAISON_DYNAMIC_ALLOCATION
+	for(int i=0;i<COMBINAISON_STATIC_ALLOCATION_SIZE;i++)
+#endif// COMBINAISON_DYNAMIC_ALLOCATION
+	{
+		size_t position = ss.str().find_first_of(",[]");
+		if((position==string::npos) || (combiString[position] == ']'))
+		{
+			//TODO should generate an error, if the combinaison is incomplete!
+			bool combinaisonIsIncomplete = false;
+			assert(combinaisonIsIncomplete);
+			break;
+		}
+		else
+		{
+			ss.seekg(position+1,ios::beg);
+			ss >> m_pColorTable[m_nbElements++];
+		}
+	}
+}
+
 Combinaison::~Combinaison()
 {
   #ifdef COMBINAISON_DYNAMIC_ALLOCATION
   delete[] m_pColorTable;
   #endif// COMBINAISON_DYNAMIC_ALLOCATION
+}
+
+string& Combinaison::str(string &strCombi) const
+{
+	strCombi = "[";
+	stringstream ss(strCombi);
+	for(U32 i=0;i<m_nbElements-1;i++)//copy all elements except the last one
+		ss << m_pColorTable[i] << ",";
+	ss << m_pColorTable[m_nbElements-1] << "]";//copy the last element and close the square bracket "]"
+	strCombi = ss.str();
+	return strCombi;
 }
 
 void Combinaison::buildCombinaison(U32 nbElements, const tColor pColorTable[])

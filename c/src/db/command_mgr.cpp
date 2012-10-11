@@ -4,6 +4,7 @@
 #include "nodeFactory.h"
 
 using namespace dbserver;
+using namespace std;
 
 //#define NB_POSITION 4
 #define SET_COMMAND "set"
@@ -25,7 +26,7 @@ using namespace dbserver;
 // 3) Add interactive command line for testing dynamically! (allow the modification of the number of color and position)
 
 //int main(int argv, char *args[])
-bool treatcommand(string inputString, string &result)
+bool treatCommand(string inputString, string &result)
 {
 	// set p4c5  [0,1,2,3]b#w#  [1,1,1,1]b2w0  [2,2,2,2]b3w1  [4,3,2,1]b2w2
 	// set p4c5  [0,1,2,3]b#w#  [0,0,0,0]b2w3
@@ -36,14 +37,13 @@ bool treatcommand(string inputString, string &result)
 	// get p4c5 b#w# b2w3 b3w1 <---Can't be found
 	// get p4c5 b#w# b2w0 b3w1
 	// get p4c5 b#w# b2w3 b3w2 <---Can't be found
-	string result;
 	if(inputString.find(SET_COMMAND)!=string::npos)
 	{
 		cerr << inputString << endl;
 		string subInputString = inputString.substr(sizeof(SET_COMMAND));
 		cerr << subInputString << endl;
 		NodeFactory nodeLocal(subInputString.c_str());
-		nodeLocal.fillNodeInit(subInputString.c_str());
+		return nodeLocal.fillNodeInit(subInputString.c_str());
 	}
 	else if(inputString.find(GET_COMMAND)!=string::npos)
 	{
@@ -51,11 +51,11 @@ bool treatcommand(string inputString, string &result)
 		string subInputString = inputString.substr(sizeof(GET_COMMAND));
 		cerr << subInputString << endl;
 		NodeFactory nodeLocal(subInputString.c_str());
-		nodeLocal.findNodeInit(subInputString.c_str(), result);
-		cout << result << endl;
+		return nodeLocal.findNodeInit(subInputString.c_str(), result);
 	}
 	else
 	{
 		cout << "unknown command" << endl;
+		return false;
 	}
 }

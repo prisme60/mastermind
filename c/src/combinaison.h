@@ -34,9 +34,12 @@ class Combinaison{
 public:
     Combinaison          (const Combinaison &combi);
     Combinaison          (U32 nbElements=0, const tColor pColorTable[]=NULL);
+	Combinaison          (string combiString);
     void buildCombinaison(U32 nbElements,   const tColor pColorTable[]=NULL);
 
     ~Combinaison();
+	
+	string& str(string &strCombi) const;
 
     bool getNextCombinaison(tColor nbColors);
     tColor operator[](U32 indexElement) const;
@@ -51,7 +54,7 @@ public:
     S32  indexOfColor(tColor color) const;
     void getCorrection(Combinaison combiTotest, U32 &blackPigs, U32 &whitePigs) const;
     bool isCombinaisonCompatible(const Combinaison &combiToTest, U32 wantedBlackPigs, U32 wantedWhitePigs) const;
-
+	
     void random(tColor nbColor);
 
     friend ostream& operator<<(ostream& os, const Combinaison& combinaison)

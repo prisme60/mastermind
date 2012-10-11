@@ -16,6 +16,10 @@
 
 #include "typedefinition.h"
 
+#ifdef _DB_VIA_UDP_
+#include "node-client-udp.h"
+#endif //_DB_VIA_UDP_
+
 using namespace std;
 
 namespace mastermind {
@@ -58,6 +62,18 @@ public:
 
     //TODO add a dot output script for graph generation
 	bool buildDotFile(const char* fileName);
+	
+	#ifdef _DB_VIA_UDP_
+	NodeCombinaison* retrieveNodeCombinaisonForScore(tLocalScore localScore);
+	bool retrieveCombinaisonForScore(tLocalScore localScore, string &result);
+	
+	static string& buildScoreString(tLocalScore localScore, string &sScore);
+	static stringstream& buildScoreString(tLocalScore localScore, stringstream &ssScore);
+
+	void buildScorePath(string &sScorepath);
+	stringstream& buildScorePath(stringstream &ssScorePath);
+	
+	#endif //_DB_VIA_UDP_
 
     typedef map<tLocalScore, NodeCombinaison, ltLocalScore> mapNodeCombinaison;
 
@@ -86,6 +102,10 @@ private:
     mapNodeCombinaison m_mapNodeCombinaison;
     Combinaison        m_combi;
     NodeCombinaison    *m_pParentCombi;
+	
+#ifdef _DB_VIA_UDP_
+	static dbclient::nodeClientUdp nodeDB;//("localhost",1500);
+#endif
 };
 
 }
