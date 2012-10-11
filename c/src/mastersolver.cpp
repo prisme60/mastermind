@@ -9,6 +9,8 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "mastersolver.h"
@@ -287,6 +289,11 @@ void MasterSolver::updateFromIteration(const Combinaison &guessComb, U32 &maximu
 #else
 void MasterSolver::createThreads()
 {
+	for(U32 t=0; t<NUMBER_OF_THREADS; t++)
+	{
+		m_MTthreadExit[t] = true;
+	}
+
 	m_MTactivityCounter=0;
     pthread_mutex_init(&MTactivityCounter_mutex, NULL);
 	
@@ -405,7 +412,7 @@ void MasterSolver::updateFromIterationMT_end(Combinaison &nextPatternCombi)
 		pthread_mutex_unlock (&MTcomb_mutex);
 		//D_BEGIN cerr << "MT # Line :" << __LINE__ << endl; D_END
 		lossOfTimeA++;
-		//D_BEGIN cerr << "MT # Display Loss of time :" << lossOfTimeB << endl; D_END
+		//D_BEGIN cerr << "MT # Display Loss of time :" << lossOfTimeA << endl; D_END
 	}
 	
 	///////////////////////////////////////////////////////////////

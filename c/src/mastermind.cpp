@@ -25,9 +25,17 @@
 #include <config.h>
 #endif
 
+#include <cstring>
 #include <iostream>
 #include <cstdlib>
-#include <time.h>
+#include <ctime>
+
+#ifdef FASTCGI_MODE
+	#include <unistd.h>
+	extern char ** environ;
+	#include "fcgio.h"
+	#include "fcgi_config.h"  // HAVE_IOSTREAM_WITHASSIGN_STREAMBUF
+#endif
 
 #include "mastersolver.h"
 
@@ -57,8 +65,15 @@ static void fullEnumeration(U32 nbColors, U32 nbPositions);
 static void randomCombinaison(U32 nbColors, U32 nbPositions);
 static void unitaryTest(U32 nbColors, U32 nbPositions);
 
+#ifdef FASTCGI_MODE
+static int fastcgi_main();
+#endif
+
 int main(int argc, char *argv[])
-{
+{ 
+#ifdef FASTCGI_MODE
+	return fastcgi_main();
+#else
   U32 nb_Colors = DEFAULT_NB_COLORS;
   U32 nb_Positions = DEFAULT_NB_POSITIONS;
   eChoice choice = cCHOICE_FULL_ENUMERATION;
@@ -108,6 +123,7 @@ int main(int argc, char *argv[])
   }
 
   return 0;
+#endif
 }
 
 #define xstr(s) str(s)
@@ -200,4 +216,88 @@ static void unitaryTest(U32 nbColors, U32 nbPositions)
   while(combi.getNextCombinaison(nbColors));
 }
 
+#ifdef FASTCGI_MODE
+static int fastcgi_main()
+{
+	int count = 0;
+	U32 nbColors=5, nbPositions=6;//these parameters will be read in the request parameters
+	MasterSolver master(nbColors,nbPositions);
+	Combinaison combi(nbPositions);
+	combi.buildCombinaison(nbPositions);//reset the combinaison!
 
+    streambuf * cin_streambuf  = cin.rdbuf();
+    streambuf * cout_streambuf = cout.rdbuf();
+    streambuf * cerr_streambuf = cerr.rdbuf();
+
+    FCGX_Request request;
+
+    FCGX_Init();
+    FCGX_InitRequest(&request, 0, 0);
+
+    while (FCGX_Accept_r(&request) == 0)
+    {
+        // Note that the default bufsize (0) will cause the use of iostream
+        // methods that require positioning (such as peek(), seek(),
+        // unget() and putback()) to fail (in favour of more efficient IO).
+        fcgi_streambuf cin_fcgi_streambuf(request.in);
+        fcgi_streambuf cout_fcgi_streambuf(request.out);
+        fcgi_streambuf cerr_fcgi_streambuf(request.err);
+
+#if HAVE_IOSTREAM_WITHASSIGN_STREAMBUF
+        cin  = &cin_fcgi_streambuf;
+        cout = &cout_fcgi_streambuf;
+        cerr = &cerr_fcgi_streambuf;
+#else
+        cin.rdbuf(&cin_fcgi_streambuf);
+        cout.rdbuf(&cout_fcgi_streambuf);
+        cerr.rdbuf(&cerr_fcgi_streambuf);
+#endif
+
+        // Although FastCGI supports writing before reading,
+        // many http clients (browsers) don't support it (so
+        // the connection deadlocks until a timeout expires!).
+        //char * content;
+        //unsigned long clen = gstdin(&request, &content);
+		
+		//nbColors=5; nbPositions=4;//these parameters will be read in the request parameters
+
+        cout << "Content-type: text/html\r\n"
+                "\r\n"
+                "<TITLE>Mastermind</TITLE>\n"
+                "<H4>Request Number: " << ++count << "</H4>\n";
+		char *value;				
+		if ((value = FCGX_GetParam("REQUEST_METHOD",request.envp)) != NULL) {
+			cout << "<p>REQUEST_METHOD="<< value << "</p>";
+		}
+		if ((value = FCGX_GetParam("QUERY_STRING",request.envp)) != NULL) {
+			cout << "<p>QUERY_STRING=?"<< value << "</p>";
+		}
+		master.setSecretCombinaison(combi);
+		master.solve();
+		cout << master << "\n";
+
+		if(combi.getNextCombinaison(nbColors) == NULL)
+			combi = Combinaison(nbPositions);
+		
+        //if (content) delete []content;
+
+        // If the output streambufs had non-zero bufsizes and
+        // were constructed outside of the accept loop (i.e.
+        // their destructor won't be called here), they would
+        // have to be flushed here.
+    }
+
+#if HAVE_IOSTREAM_WITHASSIGN_STREAMBUF
+    cin  = cin_streambuf;
+    cout = cout_streambuf;
+    cerr = cerr_streambuf;
+#else
+    cin.rdbuf(cin_streambuf);
+    cout.rdbuf(cout_streambuf);
+    cerr.rdbuf(cerr_streambuf);
+#endif
+
+    return 0;
+}
+
+#endif
