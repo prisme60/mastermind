@@ -61,7 +61,7 @@ vectorCombinaison* MasterSolver::solve()
 
   while((solutionSetSize=UpdateSolutionSet())>1)
   {
-    //Check if the pattern jhas been already compute for this correction! 
+    //Check if the pattern has been already compute for this correction! 
     NodeCombinaison *pNodeCombi =  m_pCurrentNodeCombinaison->getNodeCombinaisonForScore(m_nbColors, mCONVERT_SCORE_TO_LOCALSCORE(blackPigs,whitePigs));
     
     if(pNodeCombi!=NULL && pNodeCombi->getCombinaison()!=NULL)
@@ -270,7 +270,7 @@ void MasterSolver::guessNextPattern(Combinaison &nextPatternCombi, bool bFastSea
 	//cout << "MT # fin du travail pour les WT" << endl;
 	//Wait the end of all threads and retrieve result
 	updateFromIterationMT_end(nextPatternCombi);
-	//cout << "MT # mise à jour des variables algo à partir des variables MT" << endl;
+	//cout << "MT # mise ï¿½ jour des variables algo ï¿½ partir des variables MT" << endl;
 #endif
 }
 

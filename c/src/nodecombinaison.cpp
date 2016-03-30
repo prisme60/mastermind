@@ -19,8 +19,10 @@
 //#include "mapsearchcondition.h"
 
 namespace mastermind {
-
+    
+#ifdef _DB_VIA_UDP_
 dbclient::nodeClientUdp NodeCombinaison::nodeDB("localhost",1500);//<--This is a static variable (declared in the header file in the class NodeCombinaison)
+#endif
 
 NodeCombinaison::NodeCombinaison(const Combinaison * pCombi):m_pParentCombi(NULL)
 {
@@ -61,7 +63,7 @@ NodeCombinaison* NodeCombinaison::getNodeCombinaisonForScore(U32 nbColors, tLoca
   if(itor==m_mapNodeCombinaison.end())
   {
 #ifdef _DB_VIA_UDP_
-	return retrieveNodeCombinaisonForScore(nbColors, localScore);
+    return retrieveNodeCombinaisonForScore(nbColors, localScore);
 #else
     return NULL;
 #endif

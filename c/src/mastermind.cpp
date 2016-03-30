@@ -161,9 +161,9 @@ static void fullEnumeration(U32 nbColors, U32 nbPositions)
     //double tempTime;
     master.setSecretCombinaison(combi);
     master.solve();
-//#ifndef NO_RESULT_OUTPUT
+#ifndef NO_RESULT_OUTPUT
     cout << "==> " << master << "\n";
-//#endif
+#endif
     //clock2=clock();  tempTime = difftime(clock2,clock1)/CLOCKS_PER_SEC; clock1=clock2;
     //msTotalTime += tempTime;
     //cout << "Elapsed time =" << tempTime << "ms\n";

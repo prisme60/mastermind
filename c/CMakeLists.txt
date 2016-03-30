@@ -1,24 +1,29 @@
+cmake_minimum_required(VERSION 3.2)
 
 PROJECT(mastermind)
 
 #if you don't want the full compiler output, remove the following line
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 
+#override CXX_FLAGS
+SET(CMAKE_CXX_FLAGS "-Wall -Os")
+
+OPTION (USE_OpenMP "Use OpenMP" OFF)
+IF(USE_OpenMP)
+    FIND_PACKAGE(OpenMP)
+    IF(OPENMP_FOUND)
+        MESSAGE("OpenMP found!!!!")
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS}")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    ENDIF(OPENMP_FOUND)
+ENDIF()
+
+
 #add definitions, compiler switches, etc.
-ADD_DEFINITIONS(-Wall -O0 -g) #debug
-#ADD_DEFINITIONS(-Wall -O3) #release
-#ADD_DEFINITIONS(-Wall -O3 -ffast-math -march=athlon-tbird -mtune=athlon-tbird -mfpmath=sse -msse -mmmx)
-#ADD_DEFINITIONS(-Wall -O3 -ffast-math -march=athlon-tbird -mtune=athlon-tbird -mfpmath=sse -msse)
-#ADD_DEFINITIONS(-Wall -O3 -ffast-math -march=athlon-tbird -mtune=athlon-tbird -mfpmath=sse -msse -g)
+#ADD_DEFINITIONS(-Wall) #debug
+#ADD_DEFINITIONS(-Wall -DNO_RESULT_OUTPUT)
 
-#INCLUDE(FindSDL)
-
-#MESSAGE(STATUS SDL_FOUND=${SDL_FOUND})
-#IF(${SDL_FOUND} MATCHES "YES")
-#  MESSAGE(STATUS SDL_INCLUDE_DIR=${SDL_INCLUDE_DIR})
-#  MESSAGE(STATUS SDL_LIBRARY=${SDL_LIBRARY})
-#  INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR})
-#ENDIF(${SDL_FOUND} MATCHES "YES")
+set(CMAKE_CXX_FLAGS ${DEFINITIONS_CXXFLAGS})
 
 #list all source files here
 AUX_SOURCE_DIRECTORY(src SRC_FILES_CPP)
