@@ -94,7 +94,7 @@ public:
 
 private:
     vectorScore       m_scoreSet;//set of the possible score <== Never modified
-    listCombinaison   m_possibleSolutionSet;//Set of the possible solutions <== We add all possible Solutoins first then we reduce it after
+    listCombinaison   m_possibleSolutionSet;//Set of the possible solutions <== We add all possible Solutions first then we reduce it after
     vectorCombinaison m_pastGuessSet;
     U32 m_indexPastGuessSetTreated;
 
