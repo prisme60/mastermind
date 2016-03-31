@@ -12,7 +12,6 @@
 #ifndef MASTERMINDMASTERSOLVER_H
 #define MASTERMINDMASTERSOLVER_H
 
-#define NUMBER_OF_THREADS 1
 #define MAX_COMB_BY_THREAD 15
 
 #if NUMBER_OF_THREADS > 1
@@ -149,7 +148,7 @@ namespace mastermind {
 		pthread_mutex_unlock (&MTactivityCounter_mutex);\
 		/*D_BEGIN cerr << "MT # Line B:" << __LINE__ << "GET ActivityCounter: " << GetVariable <<endl; D_END*/
 
-        static void* thread_fun(void* args);
+        static void* thread_fun(void* args) noexcept;
 
         struct thread_fun_args {
             MasterSolver* This;
