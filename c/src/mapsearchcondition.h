@@ -8,9 +8,9 @@ namespace mastermind {
     template <class Key, class T>
     class mapSearchValue {
     public:
-        mapSearchValue(const T _value);
+        mapSearchValue(const T _value) noexcept;
 
-        bool isSearchedValue(const std::pair<const Key, const T> pairKeyValue) const;
+        bool isSearchedValue(const std::pair<const Key, const T> pairKeyValue) const noexcept;
 
     private:
         T value;

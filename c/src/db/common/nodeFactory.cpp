@@ -15,7 +15,7 @@ using namespace std;
 namespace dbserver {
     //Never call a constructor from the constructor of the same class! It is not valid in C++ (it compiles, but it doesn't work!)
 
-    NodeFactory::NodeFactory(const char path[]) {
+    NodeFactory::NodeFactory(const char path[]) noexcept{
         unsigned int _nbPosition, _nbColor;
         cerr << path << endl;
         if (sscanf(path, "p%uc%u", &_nbPosition, &_nbColor) == 2) {
@@ -26,11 +26,11 @@ namespace dbserver {
         }
     }
 
-    NodeFactory::NodeFactory(U32 _nbColor, U32 _nbPosition) {
+    NodeFactory::NodeFactory(U32 _nbColor, U32 _nbPosition) noexcept{
         initNodeFactory(_nbColor, _nbPosition);
     }
 
-    void NodeFactory::initNodeFactory(U32 _nbColor, U32 _nbPosition) {
+    void NodeFactory::initNodeFactory(U32 _nbColor, U32 _nbPosition) noexcept{
         nbColor = _nbColor;
         nbPosition = _nbPosition;
 
@@ -52,7 +52,7 @@ namespace dbserver {
         sizeOf_node_combi = mGetSizeOf_node_combi(nbPosition);
     }
 
-    bool NodeFactory::findNodeInit(const char path[], string &nodeCombi_result) {
+    bool NodeFactory::findNodeInit(const char path[], string &nodeCombi_result) noexcept{
         U8 buffer[STATIC_NODE_COMBI_SIZE];
         bool bResult = NodeFactory::findNodeInit(path, *reinterpret_cast<node_combi*> (buffer));
 
@@ -64,7 +64,7 @@ namespace dbserver {
         return bResult;
     }
 
-    bool NodeFactory::combinaisonToString(U32 maxPosition, node_combi &nodeCombi_result, string &sCombi) {
+    bool NodeFactory::combinaisonToString(U32 maxPosition, node_combi &nodeCombi_result, string &sCombi) noexcept{
         stringstream ssCombi;
         ssCombi << "[";
         for (U32 position = 0; position < maxPosition; position++) {
@@ -78,7 +78,7 @@ namespace dbserver {
         return true;
     }
 
-    bool NodeFactory::findNodeInit(const char path[], node_combi &nodeCombi_result) {
+    bool NodeFactory::findNodeInit(const char path[], node_combi &nodeCombi_result) noexcept{
         node_path_unit unitDataPath[STATIC_NODE_COMBI_SIZE];
         node_path_unit * pNodePathUnit = unitDataPath;
         U32 nbElements = 0;
@@ -102,13 +102,13 @@ namespace dbserver {
         return findNodeInit(nbElements, unitDataPath, nodeCombi_result);
     }
 
-    bool NodeFactory::findNodeInit(int nbOfElement, node_path_unit unitDataPath[], node_combi &nodeCombi_result) {
+    bool NodeFactory::findNodeInit(int nbOfElement, node_path_unit unitDataPath[], node_combi &nodeCombi_result) noexcept{
         cerr << "findNodeInit(nbOfElement=" << nbOfElement << endl;
         extra_info_struct extra;
         return findNode(UNKNOWN_NODE_ID, nbOfElement, unitDataPath, nodeCombi_result, extra);
     }
 
-    bool NodeFactory::findNode(U32 parentnode_id, int nbOfElement, node_path_unit unitDataPath[], node_combi &nodeCombi_result, extra_info_struct &extra) {
+    bool NodeFactory::findNode(U32 parentnode_id, int nbOfElement, node_path_unit unitDataPath[], node_combi &nodeCombi_result, extra_info_struct &extra) noexcept{
         cerr << "findNode(parentNode=" << parentnode_id << " ,nbOfElement=" << nbOfElement << endl;
         bool bResult = false;
         if (parentnode_id == UNKNOWN_NODE_ID) {
@@ -160,7 +160,7 @@ namespace dbserver {
         return bResult;
     }
 
-    bool NodeFactory::fillNodeInit(const char path[]) {
+    bool NodeFactory::fillNodeInit(const char path[]) noexcept{
         node_path_unit unitDataPath[STATIC_NODE_COMBI_SIZE];
         node_path_unit * pNodePathUnit = unitDataPath;
         U8 combinaisons [STATIC_NODE_COMBI_SIZE];
@@ -183,7 +183,7 @@ namespace dbserver {
         return fillNodeInit(nbElements, unitDataPath, combinaisons);
     }
 
-    bool NodeFactory::readCombinaison(stringstream &sPath, U32 maxPosition, U32 &position, U8* &pCombinaisons) {
+    bool NodeFactory::readCombinaison(stringstream &sPath, U32 maxPosition, U32 &position, U8* &pCombinaisons) noexcept{
         bool bResult = true;
         if (position == 0)//if there was no previous search
             position = sPath.str().find_first_of('[');
@@ -230,7 +230,7 @@ namespace dbserver {
         return bResult;
     }
 
-    bool NodeFactory::readCorrectionColor(stringstream &sPath, char id, U32 &correction) {
+    bool NodeFactory::readCorrectionColor(stringstream &sPath, char id, U32 &correction) noexcept{
         cerr << "readCorrectionColor" << endl;
         size_t pos = sPath.tellg();
         char c;
@@ -257,7 +257,7 @@ namespace dbserver {
         return true;
     }
 
-    bool NodeFactory::fillNodeInit(int nbOfElement, node_path_unit unitDataPath[], U8 combinaisons[]) {
+    bool NodeFactory::fillNodeInit(int nbOfElement, node_path_unit unitDataPath[], U8 combinaisons[]) noexcept{
         bool bResult = true;
         cerr << "fillNodeInit(nbOfElement=" << nbOfElement << endl;
         //first we must find which part of the beginning of the path is is the file.
@@ -273,7 +273,7 @@ namespace dbserver {
         return bResult;
     }
 
-    bool NodeFactory::fillNode(U32 parentnode_id, int nbOfElement, node_path_unit unitDataPath[], U8 combinaisons[], node_combi &nodeCombi_result) {
+    bool NodeFactory::fillNode(U32 parentnode_id, int nbOfElement, node_path_unit unitDataPath[], U8 combinaisons[], node_combi &nodeCombi_result) noexcept{
         cerr << "fillNode(parentNode=" << parentnode_id << " ,nbOfElement=" << nbOfElement << endl;
         bool bResult = false;
         if (nbOfElement > 0) {
@@ -310,5 +310,4 @@ namespace dbserver {
         }
         return bResult;
     }
-
 }

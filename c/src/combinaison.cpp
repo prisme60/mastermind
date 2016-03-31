@@ -20,11 +20,11 @@
 
 namespace mastermind {
 
-    Combinaison::Combinaison(U32 nbElements, const tColor pColorTable[]) {
+    Combinaison::Combinaison(U32 nbElements, const tColor pColorTable[]) noexcept {
         buildCombinaison(nbElements, pColorTable);
     }
 
-    Combinaison::Combinaison(const Combinaison &combi) {
+    Combinaison::Combinaison(const Combinaison &combi) noexcept {
         //This function is very important because the automatic copy doesn't do a deep copy
         //(so there is no reallocation of the m_pColorTable) ==> There is a crash when we delete the table!
         *this = combi; //operator= overload
@@ -58,13 +58,13 @@ namespace mastermind {
         }
     }
 
-    Combinaison::~Combinaison() {
+    Combinaison::~Combinaison() noexcept {
 #ifdef COMBINAISON_DYNAMIC_ALLOCATION
         delete[] m_pColorTable;
 #endif// COMBINAISON_DYNAMIC_ALLOCATION
     }
 
-    string Combinaison::str() const {
+    string Combinaison::str() const noexcept {
         string strCombi = "[";
         stringstream ss(strCombi);
         for (U32 i = 0; i < m_nbElements - 1; i++)//copy all elements except the last one
@@ -74,7 +74,7 @@ namespace mastermind {
         return std::move(strCombi);
     }
 
-    void Combinaison::buildCombinaison(U32 nbElements, const tColor pColorTable[]) {
+    void Combinaison::buildCombinaison(U32 nbElements, const tColor pColorTable[]) noexcept {
 #ifdef COMBINAISON_DYNAMIC_ALLOCATION
         if (m_nbElements < nbElements && m_pColorTable != nullptr) {//if the table of elements is too little.
             m_nbElements = nbElements; //we store the current size (so we lost the true size of the table, but it is not important)
@@ -99,7 +99,7 @@ namespace mastermind {
         }
     }
 
-    bool Combinaison::getNextCombinaison(tColor nbColors) {
+    bool Combinaison::getNextCombinaison(tColor nbColors) noexcept {
         for (U32 indexElement = 0; indexElement < m_nbElements; indexElement++) {
             if (m_pColorTable[indexElement] < nbColors - 1) {// for the current indexElement, we have found that there is a color after the current one
                 m_pColorTable[indexElement]++;
@@ -112,25 +112,25 @@ namespace mastermind {
         return false;
     }
 
-    tColor Combinaison::operator[](U32 indexElement) const {
+    tColor Combinaison::operator[](U32 indexElement) const noexcept {
         assert((indexElement < m_nbElements) && (m_pColorTable != nullptr));
         return m_pColorTable[indexElement];
     }
 
-    tColor& Combinaison::operator[](U32 indexElement) {
+    tColor& Combinaison::operator[](U32 indexElement) noexcept {
         assert((indexElement < m_nbElements) && (m_pColorTable != nullptr));
         return m_pColorTable[indexElement];
     }
 
-    Combinaison& Combinaison::clone() const {
+    Combinaison& Combinaison::clone() const noexcept {
         return *(new Combinaison(*this));
     }
 
-    void Combinaison::operator=(const Combinaison &combinaisonToCopy) {
+    void Combinaison::operator=(const Combinaison &combinaisonToCopy) noexcept {
         Combinaison::buildCombinaison(combinaisonToCopy.m_nbElements, combinaisonToCopy.m_pColorTable);
     }
 
-    bool Combinaison::operator==(const Combinaison &rightCombinaison) const {
+    bool Combinaison::operator==(const Combinaison &rightCombinaison) const noexcept {
         assert(m_pColorTable);
         if (m_pColorTable && rightCombinaison.m_pColorTable && m_nbElements != rightCombinaison.m_nbElements)
             return false;
@@ -140,27 +140,27 @@ namespace mastermind {
         return true;
     }
 
-    bool Combinaison::operator!=(const Combinaison &rightCombinaison) const {
+    bool Combinaison::operator!=(const Combinaison &rightCombinaison) const noexcept {
         return !(*this == rightCombinaison);
     }
 
-    void Combinaison::random(tColor nbColor) {
+    void Combinaison::random(tColor nbColor) noexcept {
         for (U32 indexElement = 0; indexElement < m_nbElements; indexElement++)
             m_pColorTable[indexElement] = rand() % nbColor;
     }
 
-    bool Combinaison::contains(tColor color) const {
+    bool Combinaison::contains(tColor color) const noexcept {
         return (indexOfColor(color) != -1);
     }
 
-    S32 Combinaison::indexOfColor(tColor color) const {
+    S32 Combinaison::indexOfColor(tColor color) const noexcept {
         for (U32 i = 0; i < m_nbElements; i++)
             if (m_pColorTable[i] == color)
                 return i;
         return -1;
     }
 
-    void Combinaison::getCorrection(Combinaison combiTotest, U32 &blackPigs, U32 &whitePigs) const {
+    void Combinaison::getCorrection(Combinaison combiTotest, U32 &blackPigs, U32 &whitePigs) const noexcept {
         Combinaison referenceCombinaison(*this);
         blackPigs = 0;
         whitePigs = 0;
@@ -188,7 +188,7 @@ namespace mastermind {
         //cout << referenceCombinaison << combiTotest << endl;
     }
 
-    bool Combinaison::isCombinaisonCompatible(const Combinaison &combiToTest, U32 wantedBlackPigs, U32 wantedWhitePigs) const {
+    bool Combinaison::isCombinaisonCompatible(const Combinaison &combiToTest, U32 wantedBlackPigs, U32 wantedWhitePigs) const noexcept {
         U32 computedBlackPigs, computedWhitePigs;
         getCorrection(combiToTest, computedBlackPigs, computedWhitePigs);
         return ((wantedBlackPigs == computedBlackPigs)&&(wantedWhitePigs == computedWhitePigs));

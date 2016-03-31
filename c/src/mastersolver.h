@@ -63,34 +63,34 @@ namespace mastermind {
      */
     class MasterSolver : public MasterGame {
     public:
-        MasterSolver(U32 nbColors = 6, U32 nbPositions = 4);
+        MasterSolver(U32 nbColors = 6, U32 nbPositions = 4) noexcept;
 
-        virtual ~MasterSolver();
+        virtual ~MasterSolver() noexcept;
 
-        vectorCombinaison* solve();
+        vectorCombinaison* solve() noexcept;
 
-        void generateFirstPattern(Combinaison &firstPattern);
-        U32 estimationForFirstPattern();
-        bool isCombiCompatible(const Combinaison &givenTestedCombinaison, const Combinaison &combinaisonToTest, const tScore &score) const;
-        U32 UpdateSolutionSet();
-        void guessNextPattern(Combinaison &nextPatternCombi, bool bFastSearch);
-        void updateFromIteration(const Combinaison &guessComb, U32 &maximumGuessScore, Combinaison &nextPatternCombi);
-        U32 testCurrentPattern(const Combinaison &currentGuessPattern) const;
-        void buildScoreSet();
-        U32 countRemovals(const Combinaison &guessCombinaison, const tScore &score) const;
+        void generateFirstPattern(Combinaison &firstPattern) noexcept;
+        U32 estimationForFirstPattern() noexcept;
+        bool isCombiCompatible(const Combinaison &givenTestedCombinaison, const Combinaison &combinaisonToTest, const tScore &score) const noexcept;
+        U32 UpdateSolutionSet() noexcept;
+        void guessNextPattern(Combinaison &nextPatternCombi, bool bFastSearch) noexcept;
+        void updateFromIteration(const Combinaison &guessComb, U32 &maximumGuessScore, Combinaison &nextPatternCombi) noexcept;
+        U32 testCurrentPattern(const Combinaison &currentGuessPattern) const noexcept;
+        void buildScoreSet() noexcept;
+        U32 countRemovals(const Combinaison &guessCombinaison, const tScore &score) const noexcept;
 
 #if NUMBER_OF_THREADS > 1
-        void createThreads();
-        void destroyThreads();
-        void updateFromIterationMT_emit(const Combinaison &guessComb);
-        void updateFromIterationMT_init();
-        void updateFromIterationMT_end(Combinaison &nextPatternCombi);
-        void* updateFromIterationWT(void *t);
+        void createThreads() noexcept;
+        void destroyThreads() noexcept;
+        void updateFromIterationMT_emit(const Combinaison &guessComb) noexcept;
+        void updateFromIterationMT_init() noexcept;
+        void updateFromIterationMT_end(Combinaison &nextPatternCombi) noexcept;
+        void* updateFromIterationWT(void *t) noexcept;
 #endif
 
-        friend ostream& operator<<(ostream& os, const MasterSolver& masterSolver) {
-            for (vectorCombinaison::const_iterator itor = masterSolver.m_pastGuessSet.begin(); itor != masterSolver.m_pastGuessSet.end(); ++itor) {
-                os << *itor << "\t";
+        friend ostream& operator<<(ostream& os, const MasterSolver& masterSolver) noexcept {
+            for (const auto& pastGuess : masterSolver.m_pastGuessSet) {
+                os << pastGuess << "\t";
             }
             return os;
         }

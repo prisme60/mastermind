@@ -24,14 +24,14 @@ namespace mastermind {
     dbclient::nodeClientUdp NodeCombinaison::nodeDB("localhost", 1500); //<--This is a static variable (declared in the header file in the class NodeCombinaison)
 #endif
 
-    NodeCombinaison::NodeCombinaison(const Combinaison * pCombi) : m_pParentCombi(nullptr) {
+    NodeCombinaison::NodeCombinaison(const Combinaison * pCombi) noexcept : m_pParentCombi(nullptr) {
         if (pCombi != nullptr)
             m_combi = *pCombi;
     }
 
     //obtained by getting the level of the parent +1, if parent not nullptr (recursive function)
 
-    U32 NodeCombinaison::getLevel() {
+    U32 NodeCombinaison::getLevel() noexcept {
         if (m_pParentCombi == nullptr)
             return 0;
         else
@@ -40,19 +40,19 @@ namespace mastermind {
 
     //set the combinaison of the node
 
-    void NodeCombinaison::setCombinaison(const Combinaison &combinaison) {
+    void NodeCombinaison::setCombinaison(const Combinaison &combinaison) noexcept {
         m_combi = combinaison;
     }
 
     //get the combinaison of the node
 
-    const Combinaison* NodeCombinaison::getCombinaison() const {
+    const Combinaison* NodeCombinaison::getCombinaison() const noexcept {
         return &m_combi;
     }
 
     //get the combinaison of the child node corresponding to the score
 
-    NodeCombinaison* NodeCombinaison::getNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore) {
+    NodeCombinaison* NodeCombinaison::getNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore) noexcept {
         mapNodeCombinaison::iterator itor = m_mapNodeCombinaison.find(localScore);
         if (itor == m_mapNodeCombinaison.end()) {
 #ifdef _DB_VIA_UDP_
@@ -66,7 +66,7 @@ namespace mastermind {
 
 #ifdef _DB_VIA_UDP_
 
-NodeCombinaison* NodeCombinaison::retrieveNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore) {
+    NodeCombinaison* NodeCombinaison::retrieveNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore) noexcept {
         string result;
         if (retrieveCombinaisonForScore(nbColors, localScore, result) && result.find_first_of('[') != string::npos) {
             Combinaison combi(result);
@@ -79,25 +79,25 @@ NodeCombinaison* NodeCombinaison::retrieveNodeCombinaisonForScore(U32 nbColors, 
         return nullptr;
     }
 
-    string& NodeCombinaison::buildScoreString(tLocalScore localScore, string &sScore) {
+    string& NodeCombinaison::buildScoreString(tLocalScore localScore, string &sScore) noexcept {
         stringstream ss(sScore);
         buildScoreString(localScore, ss);
         sScore = ss.str();
         return sScore;
     }
 
-    stringstream& NodeCombinaison::buildScoreString(tLocalScore localScore, stringstream &ssScore) {
+    stringstream& NodeCombinaison::buildScoreString(tLocalScore localScore, stringstream &ssScore) noexcept {
         ssScore << 'b' << mGET_BLACK_SCORE_FROM_LOCALSCORE(localScore)
                 << 'w' << mGET_WHITE_SCORE_FROM_LOCALSCORE(localScore);
         return ssScore;
     }
 
-    void NodeCombinaison::buildScorePath(string &sScorepath) {
+    void NodeCombinaison::buildScorePath(string &sScorepath) noexcept {
         stringstream ss(sScorepath);
         sScorepath = buildScorePath(ss).str();
     }
 
-    stringstream& NodeCombinaison::buildScorePath(stringstream &ssScorePath) {
+    stringstream& NodeCombinaison::buildScorePath(stringstream &ssScorePath) noexcept {
         if (m_pParentCombi != nullptr) {
             mapNodeCombinaison::iterator it;
             for (it = m_pParentCombi->m_mapNodeCombinaison.begin(); it != m_pParentCombi->m_mapNodeCombinaison.end(); it++) {
@@ -112,7 +112,7 @@ NodeCombinaison* NodeCombinaison::retrieveNodeCombinaisonForScore(U32 nbColors, 
         return ssScorePath;
     }
 
-    stringstream& NodeCombinaison::buildCombiScorePath(stringstream &ssScorePath) {
+    stringstream& NodeCombinaison::buildCombiScorePath(stringstream &ssScorePath) noexcept {
         if (m_pParentCombi != nullptr) {
             mapNodeCombinaison::iterator it;
             for (it = m_pParentCombi->m_mapNodeCombinaison.begin(); it != m_pParentCombi->m_mapNodeCombinaison.end(); it++) {
@@ -128,7 +128,7 @@ NodeCombinaison* NodeCombinaison::retrieveNodeCombinaisonForScore(U32 nbColors, 
         return ssScorePath;
     }
 
-    bool NodeCombinaison::retrieveCombinaisonForScore(U32 nbColors, tLocalScore localScore, string &result) {
+    bool NodeCombinaison::retrieveCombinaisonForScore(U32 nbColors, tLocalScore localScore, string &result) noexcept {
         stringstream ssCommand;
         ssCommand << "get p" << m_combi.getNbPositions() << 'c' << nbColors;
         buildScorePath(ssCommand) << " ";
@@ -136,7 +136,7 @@ NodeCombinaison* NodeCombinaison::retrieveNodeCombinaisonForScore(U32 nbColors, 
         return nodeDB.sendCommand(ssCommand.str(), result);
     }
 
-    bool NodeCombinaison::storeCombinaison(U32 nbColors, string &result) {
+    bool NodeCombinaison::storeCombinaison(U32 nbColors, string &result) noexcept {
         stringstream ssCommand;
         ssCommand << "set p" << m_combi.getNbPositions() << 'c' << nbColors;
         buildCombiScorePath(ssCommand);
@@ -146,7 +146,7 @@ NodeCombinaison* NodeCombinaison::retrieveNodeCombinaisonForScore(U32 nbColors, 
 
     //return false, if the combinaison already exist and it is different from the new combinaison
 
-    bool NodeCombinaison::addCombinaison(U32 nbColors, const Combinaison &combi, tLocalScore localScore, NodeCombinaison *&pNewNodeCombinaison, bool storeIntoDB) {
+    bool NodeCombinaison::addCombinaison(U32 nbColors, const Combinaison &combi, tLocalScore localScore, NodeCombinaison *&pNewNodeCombinaison, bool storeIntoDB) noexcept {
         NodeCombinaison *pNodeCombi;
         if ((pNodeCombi = getNodeCombinaisonForScore(nbColors, localScore)) == nullptr) {//the combi is not present, so we add it to the map
             NodeCombinaison nodeCombi(&combi);
@@ -169,7 +169,7 @@ NodeCombinaison* NodeCombinaison::retrieveNodeCombinaisonForScore(U32 nbColors, 
 
     //build the dot file from the current node (should be the root node)
 
-    bool NodeCombinaison::buildDotFile(const std::string &fileName) {
+    bool NodeCombinaison::buildDotFile(const std::string &fileName) noexcept {
         ofstream fos(fileName);
         fos << "digraph g {\n";
         fos << "rankdir=LR\n";

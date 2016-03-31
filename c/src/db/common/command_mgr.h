@@ -3,6 +3,6 @@
 
 #include <string>
 
-bool treatCommand(std::string inputString, std::string &result);
+bool treatCommand(std::string inputString, std::string &result) noexcept;
 
 #endif //__COMMAND_MGR_H__

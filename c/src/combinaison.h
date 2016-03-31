@@ -32,36 +32,36 @@ namespace mastermind {
      */
     class Combinaison {
     public:
-        Combinaison(const Combinaison &combi);
-        Combinaison(U32 nbElements = 0, const tColor pColorTable[] = nullptr);
+        Combinaison(const Combinaison &combi) noexcept;
+        Combinaison(U32 nbElements = 0, const tColor pColorTable[] = nullptr) noexcept;
         Combinaison(string combiString);
-        void buildCombinaison(U32 nbElements, const tColor pColorTable[] = nullptr);
+        void buildCombinaison(U32 nbElements, const tColor pColorTable[] = nullptr) noexcept;
 
-        ~Combinaison();
+        ~Combinaison() noexcept;
 
-        string str() const;
+        string str() const noexcept;
 
-        bool getNextCombinaison(tColor nbColors);
-        tColor operator[](U32 indexElement) const;
-        tColor& operator[](U32 indexElement);
+        bool getNextCombinaison(tColor nbColors) noexcept;
+        tColor operator[](U32 indexElement) const noexcept;
+        tColor& operator[](U32 indexElement) noexcept;
 
-        Combinaison& clone() const;
-        void operator=(const Combinaison &combinaisonToCopy);
-        bool operator==(const Combinaison &rightCombinaison) const;
-        bool operator!=(const Combinaison &rightCombinaison) const;
+        Combinaison& clone() const noexcept;
+        void operator=(const Combinaison &combinaisonToCopy) noexcept;
+        bool operator==(const Combinaison &rightCombinaison) const noexcept;
+        bool operator!=(const Combinaison &rightCombinaison) const noexcept;
 
-        bool contains(tColor color) const;
-        S32 indexOfColor(tColor color) const;
-        void getCorrection(Combinaison combiTotest, U32 &blackPigs, U32 &whitePigs) const;
-        bool isCombinaisonCompatible(const Combinaison &combiToTest, U32 wantedBlackPigs, U32 wantedWhitePigs) const;
+        bool contains(tColor color) const noexcept;
+        S32 indexOfColor(tColor color) const noexcept;
+        void getCorrection(Combinaison combiTotest, U32 &blackPigs, U32 &whitePigs) const noexcept;
+        bool isCombinaisonCompatible(const Combinaison &combiToTest, U32 wantedBlackPigs, U32 wantedWhitePigs) const noexcept;
 
-        void random(tColor nbColor);
+        void random(tColor nbColor) noexcept;
 
-        inline U32 getNbPositions() {
+        inline U32 getNbPositions() noexcept{
             return m_nbElements;
         }
 
-        friend ostream& operator<<(ostream& os, const Combinaison& combinaison) {
+        friend ostream& operator<<(ostream& os, const Combinaison& combinaison) noexcept {
             os << "[";
             for (U32 indexElement = 0; indexElement < combinaison.m_nbElements; indexElement++) {
                 os << combinaison.m_pColorTable[indexElement];

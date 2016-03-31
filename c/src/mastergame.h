@@ -24,17 +24,17 @@ namespace mastermind {
      */
     class MasterGame {
     public:
-        MasterGame(U32 nbColors = 6, U32 nbPositions = 4);
+        MasterGame(U32 nbColors = 6, U32 nbPositions = 4) noexcept;
 
-        void generateSecretCombinaison();
+        void generateSecretCombinaison() noexcept;
 
-        void setSecretCombinaison(Combinaison &combi);
-        const Combinaison& getSecretCombinaison() const;
+        void setSecretCombinaison(Combinaison &combi) noexcept;
+        const Combinaison& getSecretCombinaison() const noexcept;
 
-        void getCorrection(const Combinaison &referenceCombinaison, const Combinaison &combiTotest, U32 &blackPigs, U32 &whitePigs) const;
-        void getCorrectionOfSecretCombinaison(const Combinaison &combiTotest, U32 &blackPigs, U32 &whitePigs) const;
+        void getCorrection(const Combinaison &referenceCombinaison, const Combinaison &combiTotest, U32 &blackPigs, U32 &whitePigs) const noexcept;
+        void getCorrectionOfSecretCombinaison(const Combinaison &combiTotest, U32 &blackPigs, U32 &whitePigs) const noexcept;
 
-        friend ostream& operator<<(ostream& os, const MasterGame& masterGame) {
+        friend ostream& operator<<(ostream& os, const MasterGame& masterGame) noexcept{
             os << "masterGame: SecretCombinaison" << masterGame.m_secretCombinaison
                     << " nbColors =" << masterGame.m_nbColors
                     << " nbPositions=" << masterGame.m_nbPositions;

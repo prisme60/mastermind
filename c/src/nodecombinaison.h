@@ -39,17 +39,17 @@ namespace mastermind {
      */
     class NodeCombinaison {
     public:
-        NodeCombinaison(const Combinaison * pCombi = nullptr);
+        NodeCombinaison(const Combinaison * pCombi = nullptr) noexcept;
 
-        U32 getLevel(); //obtained by getting the level of the parent +1, if parent not nullptr (recursive function)
+        U32 getLevel() noexcept; //obtained by getting the level of the parent +1, if parent not nullptr (recursive function)
 
-        void setCombinaison(const Combinaison &combinaison); //set the combinaison of the node
-        const Combinaison* getCombinaison() const; //get the combinaison of the node
-        NodeCombinaison* getNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore); //get the combinaison of the child node corresponding to the score
-        bool addCombinaison(U32 nbColors, const Combinaison &combi, tLocalScore localScore, NodeCombinaison *&newNodeCombinaison, bool storeIntoDB = false); //return false, if the combinaison already exist and it is different from the new combinaison
+        void setCombinaison(const Combinaison &combinaison) noexcept; //set the combinaison of the node
+        const Combinaison* getCombinaison() const noexcept; //get the combinaison of the node
+        NodeCombinaison* getNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore) noexcept; //get the combinaison of the child node corresponding to the score
+        bool addCombinaison(U32 nbColors, const Combinaison &combi, tLocalScore localScore, NodeCombinaison *&newNodeCombinaison, bool storeIntoDB = false) noexcept; //return false, if the combinaison already exist and it is different from the new combinaison
 
         //TODO add a dot output script for graph generation
-        bool buildDotFile(const std::string &fileName);
+        bool buildDotFile(const std::string &fileName) noexcept;
 
 #ifdef _DB_VIA_UDP_
         NodeCombinaison* retrieveNodeCombinaisonForScore(U32 nbColors, tLocalScore localScore);
@@ -68,7 +68,7 @@ namespace mastermind {
 
         typedef map<tLocalScore, NodeCombinaison> mapNodeCombinaison;
 
-        friend ostream& operator<<(ostream& os, const NodeCombinaison& nodeCombinaison) {
+        friend ostream& operator<<(ostream& os, const NodeCombinaison& nodeCombinaison)  noexcept{
             static U32 indexNode = 0;
             U32 indexNodeParent = indexNode;
             os << "node" << indexNodeParent << "[label=\"" << nodeCombinaison.m_combi << "\"]\n";

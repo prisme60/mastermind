@@ -19,7 +19,7 @@
 
 namespace mastermind {
 
-    MasterSolver::MasterSolver(U32 nbColors, U32 nbPositions) : MasterGame(nbColors, nbPositions) {
+    MasterSolver::MasterSolver(U32 nbColors, U32 nbPositions) noexcept : MasterGame(nbColors, nbPositions) {
         buildScoreSet();
 
         Combinaison combi(m_nbPositions);
@@ -30,13 +30,13 @@ namespace mastermind {
 #endif
     }
 
-    MasterSolver::~MasterSolver() {
+    MasterSolver::~MasterSolver() noexcept {
 #if NUMBER_OF_THREADS > 1
         destroyThreads();
 #endif
     }
 
-    vectorCombinaison* MasterSolver::solve() {
+    vectorCombinaison* MasterSolver::solve() noexcept {
         U32 solutionSetSize;
         //reset previous resolve variables
         m_pastGuessSet.clear();
@@ -104,7 +104,7 @@ namespace mastermind {
         return &m_pastGuessSet;
     }
 
-    void MasterSolver::generateFirstPattern(Combinaison &firstPattern) {
+    void MasterSolver::generateFirstPattern(Combinaison &firstPattern) noexcept {
         U32 nbDuplicate = estimationForFirstPattern();
         U32 * pGuessCombinaison;
         pGuessCombinaison = new U32[m_nbPositions];
@@ -115,7 +115,7 @@ namespace mastermind {
         delete pGuessCombinaison;
     }
 
-    U32 MasterSolver::estimationForFirstPattern() {
+    U32 MasterSolver::estimationForFirstPattern() noexcept {
         U32 * pColorCountTable = new U32[m_nbColors];
         U32 * pDuplicates = new U32[m_nbPositions];
 
@@ -160,7 +160,7 @@ namespace mastermind {
         return indexOfMaxDuplicate + 1;
     }
 
-    bool MasterSolver::isCombiCompatible(const Combinaison &givenTestedCombinaison, const Combinaison &combinaisonToTest, const tScore &score) const {
+    bool MasterSolver::isCombiCompatible(const Combinaison &givenTestedCombinaison, const Combinaison &combinaisonToTest, const tScore &score) const noexcept {
         //Permit to know if the guessCombinaisonResult is compatible with the given tested combinaison"
         U32 blackPigs, whitePigs;
         getCorrection(combinaisonToTest, givenTestedCombinaison, blackPigs, whitePigs);
@@ -170,7 +170,7 @@ namespace mastermind {
     /**
      *return the number of element in the solution Set
      */
-    U32 MasterSolver::UpdateSolutionSet() {
+    U32 MasterSolver::UpdateSolutionSet() noexcept {
         U32 blackPigs, whitePigs;
         if (m_possibleSolutionSet.empty())//if there is no reasearch done before, we have to consider all solutions
         {
@@ -206,7 +206,7 @@ namespace mastermind {
         return m_possibleSolutionSet.size();
     }
 
-    void MasterSolver::guessNextPattern(Combinaison &nextPatternCombi, bool bFastSearch) {
+    void MasterSolver::guessNextPattern(Combinaison &nextPatternCombi, bool bFastSearch) noexcept {
 #if NUMBER_OF_THREADS <= 1
         U32 maximumGuessScore = 0;
 #else
@@ -242,7 +242,7 @@ namespace mastermind {
 
 #if NUMBER_OF_THREADS <= 1
 
-    void MasterSolver::updateFromIteration(const Combinaison &guessComb, U32 &maximumGuessScore, Combinaison &nextPatternCombi) {
+    void MasterSolver::updateFromIteration(const Combinaison &guessComb, U32 &maximumGuessScore, Combinaison &nextPatternCombi) noexcept {
         U32 thisScore = testCurrentPattern(guessComb);
         if (thisScore > maximumGuessScore) {
             //cout << "guessComb " << guessComb << " number_of_removals score: " << thisScore<< " BETTER\n";
@@ -252,7 +252,7 @@ namespace mastermind {
     }
 #else
 
-    void MasterSolver::createThreads() {
+    void MasterSolver::createThreads() noexcept {
         for (U32 t = 0; t < NUMBER_OF_THREADS; t++) {
             m_MTthreadExit[t] = true;
         }
@@ -289,7 +289,7 @@ namespace mastermind {
         pthread_attr_destroy(&attr);
     }
 
-    void MasterSolver::destroyThreads() {
+    void MasterSolver::destroyThreads() noexcept {
         for (U32 t = 0; t < NUMBER_OF_THREADS; t++) {
             m_MTthreadExit[t] = false;
         }
@@ -307,12 +307,12 @@ namespace mastermind {
         pthread_mutex_destroy(&MTactivityCounter_mutex);
     }
 
-    void MasterSolver::updateFromIterationMT_init() {
+    void MasterSolver::updateFromIterationMT_init() noexcept {
         //don't need to protect the variable when changing it, because the working threads (WT) are waiting comb input from the MT thread
         m_MTmaximumGuessScore = 0;
     }
 
-    void MasterSolver::updateFromIterationMT_emit(const Combinaison &guessComb) {
+    void MasterSolver::updateFromIterationMT_emit(const Combinaison &guessComb) noexcept {
         //D_BEGIN cerr << "MT # EMIT BEGIN" << endl; D_END
         //transmit request to a thread
         pthread_mutex_lock(&MTcomb_mutex);
@@ -329,7 +329,7 @@ namespace mastermind {
         // usleep(1);
     }
 
-    void MasterSolver::updateFromIterationMT_end(Combinaison &nextPatternCombi) {
+    void MasterSolver::updateFromIterationMT_end(Combinaison &nextPatternCombi) noexcept {
         bool inputCombEmpty = false;
         U32 numberOfActiveThread;
         U32 lossOfTimeA = 0, lossOfTimeB = 0;
@@ -400,14 +400,14 @@ namespace mastermind {
         //cout << "Final result Combinaison: " << nextPatternCombi << " number_of_removals score: " << m_MTmaximumGuessScore << "\n";
     }
 
-    void* MasterSolver::thread_fun(void* args) {
+    void* MasterSolver::thread_fun(void* args) noexcept {
         thread_fun_args *tfArgs = static_cast<thread_fun_args*> (args);
         void* ret = tfArgs->This->updateFromIterationWT(reinterpret_cast<void *> (tfArgs->Id));
         delete tfArgs;
         return ret;
     }
 
-    void* MasterSolver::updateFromIterationWT(void *t) {
+    void* MasterSolver::updateFromIterationWT(void *t) noexcept {
         U32 id = reinterpret_cast<U32> (t);
         //D_BEGIN cerr << id << " # updateFromIterationWT" << endl; D_END
         vectorCombinaison vectComb;
@@ -473,7 +473,7 @@ namespace mastermind {
     }
 #endif
 
-    U32 MasterSolver::testCurrentPattern(const Combinaison &currentGuessPattern) const {
+    U32 MasterSolver::testCurrentPattern(const Combinaison &currentGuessPattern) const noexcept {
         U32 thisScore = ~0;
         for (const auto& score : m_scoreSet) {
             U32 tempScore = countRemovals(currentGuessPattern, score);
@@ -483,7 +483,7 @@ namespace mastermind {
         return thisScore;
     }
 
-    void MasterSolver::buildScoreSet() {
+    void MasterSolver::buildScoreSet() noexcept {
         m_scoreSet.clear(); //remove all elements
         for (U32 iBlack = 0; iBlack <= m_nbPositions; iBlack++) {
             for (U32 iWhite = 0; iWhite <= m_nbPositions - iBlack; iWhite++) {
@@ -496,7 +496,7 @@ namespace mastermind {
     /**
      *Score is corresponding to the correction#include "combinaison.h"
      */
-    U32 MasterSolver::countRemovals(const Combinaison &guessCombinaison, const tScore &score) const {
+    U32 MasterSolver::countRemovals(const Combinaison &guessCombinaison, const tScore &score) const noexcept {
         U32 count = 0;
 
         for (const auto& possibleSolution : m_possibleSolutionSet) {
