@@ -22,67 +22,67 @@ namespace mastermind {
 #undef COMBINAISON_DYNAMIC_ALLOCATION
 #define COMBINAISON_STATIC_ALLOCATION_SIZE 10
 
-typedef U32 tColor;
-typedef U32 tCombinaisonId;
+    using tColor = U32;
+    using tCombinaisonId = U32;
 
-/**
-This class implement the combinaison structure.
+    /**
+    This class implement the combinaison structure.
 
-	@author 
-*/
-class Combinaison{
-public:
-    Combinaison          (const Combinaison &combi);
-    Combinaison          (U32 nbElements=0, const tColor pColorTable[]=NULL);
-	Combinaison          (string combiString);
-    void buildCombinaison(U32 nbElements,   const tColor pColorTable[]=NULL);
+            @author 
+     */
+    class Combinaison {
+    public:
+        Combinaison(const Combinaison &combi);
+        Combinaison(U32 nbElements = 0, const tColor pColorTable[] = nullptr);
+        Combinaison(string combiString);
+        void buildCombinaison(U32 nbElements, const tColor pColorTable[] = nullptr);
 
-    ~Combinaison();
-	
-	string& str(string &strCombi) const;
+        ~Combinaison();
 
-    bool getNextCombinaison(tColor nbColors);
-    tColor operator[](U32 indexElement) const;
-    tColor& operator[](U32 indexElement);
+        string str() const;
 
-    Combinaison& clone() const;
-    void operator=(const Combinaison &combinaisonToCopy);
-    bool operator==(const Combinaison &rightCombinaison) const;
-    bool operator!=(const Combinaison &rightCombinaison) const;
+        bool getNextCombinaison(tColor nbColors);
+        tColor operator[](U32 indexElement) const;
+        tColor& operator[](U32 indexElement);
 
-    bool contains(tColor color) const;
-    S32  indexOfColor(tColor color) const;
-    void getCorrection(Combinaison combiTotest, U32 &blackPigs, U32 &whitePigs) const;
-    bool isCombinaisonCompatible(const Combinaison &combiToTest, U32 wantedBlackPigs, U32 wantedWhitePigs) const;
-	
-    void random(tColor nbColor);
-	
-	inline U32 getNbPositions() {return m_nbElements;}
+        Combinaison& clone() const;
+        void operator=(const Combinaison &combinaisonToCopy);
+        bool operator==(const Combinaison &rightCombinaison) const;
+        bool operator!=(const Combinaison &rightCombinaison) const;
 
-    friend ostream& operator<<(ostream& os, const Combinaison& combinaison)
-    {
-      os << "[";
-      for(U32 indexElement=0;indexElement<combinaison.m_nbElements;indexElement++)
-      {
-        os << combinaison.m_pColorTable[indexElement];
-        if(indexElement<combinaison.m_nbElements-1)
-          os << ",";
-      }
-      os << "]";
-      return os;
-    }
+        bool contains(tColor color) const;
+        S32 indexOfColor(tColor color) const;
+        void getCorrection(Combinaison combiTotest, U32 &blackPigs, U32 &whitePigs) const;
+        bool isCombinaisonCompatible(const Combinaison &combiToTest, U32 wantedBlackPigs, U32 wantedWhitePigs) const;
 
-//    static tCombinaisonId Combinaison::ComputeCombinaisonId(U8 nbElements, U8 nbColors, U8 *pColorTable);
-//    static void Combinaison::ComputeTable(U8 nbElements, U8 nbColors, tCombinaisonId combinaisonId, U8 *&pOutColorTable);
+        void random(tColor nbColor);
 
-private:
-  #ifdef COMBINAISON_DYNAMIC_ALLOCATION
-    tColor * m_pColorTable;
-  #else //notdef COMBINAISON_DYNAMIC_ALLOCATION
-    tColor m_pColorTable[COMBINAISON_STATIC_ALLOCATION_SIZE];
-  #endif //COMBINAISON_DYNAMIC_ALLOCATION
-    U32      m_nbElements;
-};
+        inline U32 getNbPositions() {
+            return m_nbElements;
+        }
+
+        friend ostream& operator<<(ostream& os, const Combinaison& combinaison) {
+            os << "[";
+            for (U32 indexElement = 0; indexElement < combinaison.m_nbElements; indexElement++) {
+                os << combinaison.m_pColorTable[indexElement];
+                if (indexElement < combinaison.m_nbElements - 1)
+                    os << ",";
+            }
+            os << "]";
+            return os;
+        }
+
+        //    static tCombinaisonId Combinaison::ComputeCombinaisonId(U8 nbElements, U8 nbColors, U8 *pColorTable);
+        //    static void Combinaison::ComputeTable(U8 nbElements, U8 nbColors, tCombinaisonId combinaisonId, U8 *&pOutColorTable);
+
+    private:
+#ifdef COMBINAISON_DYNAMIC_ALLOCATION
+        tColor m_pColorTable = nullptr;
+#else //notdef COMBINAISON_DYNAMIC_ALLOCATION
+        tColor m_pColorTable[COMBINAISON_STATIC_ALLOCATION_SIZE];
+#endif //COMBINAISON_DYNAMIC_ALLOCATION
+        U32 m_nbElements = 0;
+    };
 
 }
 

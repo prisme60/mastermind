@@ -18,35 +18,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 /*
-* $Log$
-*/
+ * $Log$
+ */
 
 #ifndef LABYTYPEDEFINITION_H
 #define LABYTYPEDEFINITION_H
 
-typedef bool		U1;
-typedef unsigned char	U8;
-typedef unsigned short	U16;
-typedef unsigned long	U32;
+using U8 = unsigned char;
+using U16 = unsigned short;
+using U32 = unsigned long;
 
-typedef char	S8;
-typedef short	S16;
-typedef long	S32;
+using S8 = char;
+using S16 = short;
+using S32 = long;
 
 #define mMin(x,y) (((x)<(y))?(x):(y))
 #define mMax(x,y) (((x)>(y))?(x):(y))
 #define mAbsDiff(x,y) (((x)>(y))?((x)-(y)):((y)-(x)))
-
-#define mLibAssert(boolVal) while(!boolVal);
-
-namespace mastermind
-{
-
-typedef struct{
-U32 blackPigs;
-U32 whitePigs;
-} tScore;
-
-}
 
 #endif

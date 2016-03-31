@@ -19,38 +19,33 @@ using namespace std;
 
 namespace mastermind {
 
-/**
-This class permit to solve a mastermind problem with a minimum of tries
+    /**
+    This class permit to solve a mastermind problem with a minimum of tries
+     */
+    class MasterGame {
+    public:
+        MasterGame(U32 nbColors = 6, U32 nbPositions = 4);
 
-	@author 
-*/
-class MasterGame{
-public:
-    MasterGame(U32 nbColors=6, U32 nbPositions=4);
+        void generateSecretCombinaison();
 
-//    ~MasterGame();
+        void setSecretCombinaison(Combinaison &combi);
+        const Combinaison& getSecretCombinaison() const;
 
-    void generateSecretCombinaison();
+        void getCorrection(const Combinaison &referenceCombinaison, const Combinaison &combiTotest, U32 &blackPigs, U32 &whitePigs) const;
+        void getCorrectionOfSecretCombinaison(const Combinaison &combiTotest, U32 &blackPigs, U32 &whitePigs) const;
 
-    void setSecretCombinaison(Combinaison &combi);
-    const Combinaison& getSecretCombinaison() const;
+        friend ostream& operator<<(ostream& os, const MasterGame& masterGame) {
+            os << "masterGame: SecretCombinaison" << masterGame.m_secretCombinaison
+                    << " nbColors =" << masterGame.m_nbColors
+                    << " nbPositions=" << masterGame.m_nbPositions;
+            return os;
+        }
 
-    void getCorrection(const Combinaison &referenceCombinaison, const Combinaison &combiTotest, U32 &blackPigs, U32 &whitePigs);
-    void getCorrectionOfSecretCombinaison(                      const Combinaison &combiTotest, U32 &blackPigs, U32 &whitePigs);
-
-    friend ostream& operator<<(ostream& os, const MasterGame& masterGame)
-    {
-      os << "masterGame: SecretCombinaison" << masterGame.m_secretCombinaison 
-         <<" nbColors ="  << masterGame.m_nbColors
-         <<" nbPositions="<< masterGame.m_nbPositions;
-      return os;
-    }
-
-protected:
-    tColor m_nbColors;
-    U32    m_nbPositions;
-    Combinaison m_secretCombinaison;
-};
+    protected:
+        tColor m_nbColors;
+        U32 m_nbPositions;
+        Combinaison m_secretCombinaison;
+    };
 
 }
 

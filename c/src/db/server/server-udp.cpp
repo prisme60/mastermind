@@ -9,92 +9,89 @@
 #include "command_mgr.h"
 
 #define MAX_MSG 255
-// 3 caractères pour les codes ASCII 'cr', 'lf' et '\0'
+// 3 caracteres pour les codes ASCII 'cr', 'lf' et '\0'
 #define MSG_ARRAY_SIZE (MAX_MSG+3)
 
 using namespace std;
 
-int main()
-{
-  int listenSocket;
-  unsigned short int listenPort;
-  socklen_t clientAddressLength;
-  struct sockaddr_in clientAddress, serverAddress;
-  char msg[MSG_ARRAY_SIZE];
+int main() {
+    int listenSocket;
+    unsigned short int listenPort;
+    socklen_t clientAddressLength;
+    struct sockaddr_in clientAddress, serverAddress;
+    char msg[MSG_ARRAY_SIZE];
 
-  memset(msg, 0x0, MSG_ARRAY_SIZE);  // Mise à zéro du tampon
+    memset(msg, 0x0, MSG_ARRAY_SIZE); // Mise Ã  zÃ©ro du tampon
 
-  cout << "Entrez le numéro de port utilisé en écoute (entre 1500 et 65000) : ";
-  cin >> listenPort;
+    cout << "Entrez le numero de port utilisÃ© en Ã©coute (entre 1500 et 65000) : ";
+    cin >> listenPort;
 
-  // Création de socket en écoute et attente des requêtes des clients
-  listenSocket = socket(AF_INET, SOCK_DGRAM, 0);
-  if (listenSocket < 0) {
-    cerr << "Impossible de créer le socket en écoute\n";
-    exit(1);
-  }
-  
-  // On relie le socket au port en écoute.
-  // On commence par initialiser les champs de la structure serverAddress puis
-  // on appelle bind(). Les fonctions htonl() et htons() convertissent
-  // respectivement les entiers longs et les entiers courts du rangement hôte
-  // (sur x86 on trouve l'octet de poids faible en premier) vers le rangement
-  // réseau (octet de poids fort en premier).
-  serverAddress.sin_family = AF_INET;
-  serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-  serverAddress.sin_port = htons(listenPort);
-  
-  if (bind(listenSocket,
-           (struct sockaddr *) &serverAddress,
-           sizeof(serverAddress)) < 0) {
-    cerr << "Impossible de lier le socket en écoute\n";
-    exit(1);
-  }
-
-  // Attente des requêtes des clients.
-  // C'est un appel non-bloquant ; c'est-à-dire qu'il enregistre ce programme
-  // auprès du système comme devant attendre des connexions sur ce socket avec
-  // cette tâche. Ensuite, l'exécution se poursuit.
-  listen(listenSocket, 5);
-  
-  cout << "Attente de requête sur le port " << listenPort << "\n";
-
-  while (1) {
-
-    clientAddressLength = sizeof(clientAddress);
-
-    // Mise à zéro du tampon de façon à connaître le délimiteur
-    // de fin de chaîne.
-    memset(msg, 0x0, MSG_ARRAY_SIZE);
-	
-	int nbReceivedByte = recvfrom(listenSocket, msg, MSG_ARRAY_SIZE, 0, (struct sockaddr *) &clientAddress, &clientAddressLength);
-	
-    if (nbReceivedByte < 0) {
-      cerr << "  Problème de réception du messsage\n";
-      exit(1);
+    // CrÃ©ation de socket en Ã©coute et attente des requetes des clients
+    listenSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (listenSocket < 0) {
+        cerr << "Impossible de crÃ©er le socket en Ã©coute\n";
+        exit(1);
     }
-	else
-	{
-		 msg[nbReceivedByte+1]='\0';
-	}
 
-    // Affichage de l'adresse IP du client.
-    cout << "  Depuis " << inet_ntoa(clientAddress.sin_addr);
+    // On relie le socket au port en Ã©coute.
+    // On commence par initialiser les champs de la structure serverAddress puis
+    // on appelle bind(). Les fonctions htonl() et htons() convertissent
+    // respectivement les entiers longs et les entiers courts du rangement hote
+    // (sur x86 on trouve l'octet de poids faible en premier) vers le rangement
+    // rÃ©seau (octet de poids fort en premier).
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+    serverAddress.sin_port = htons(listenPort);
 
-    // Affichage du numéro de port du client.
-    cout << ":" << ntohs(clientAddress.sin_port) << "\n";
+    if (bind(listenSocket,
+            (struct sockaddr *) &serverAddress,
+            sizeof (serverAddress)) < 0) {
+        cerr << "Impossible de lier le socket en Ã©coute\n";
+        exit(1);
+    }
 
-    // Affichage de la ligne reçue
-    cout << "  Message reçu : " << msg << "\n";
-	
-	string result;
-	string sMsg(msg);
-	treatCommand(sMsg,result);
+    // Attente des requetes des clients.
+    // C'est un appel non-bloquant ; c'est-Ã -dire qu'il enregistre ce programme
+    // auprÃ¨s du systÃ¨me comme devant attendre des connexions sur ce socket avec
+    // cette tache. Ensuite, l'exÃ©cution se poursuit.
+    listen(listenSocket, 5);
 
-    // Renvoi de la ligne convertie au client.
-    if (sendto(listenSocket, result.c_str(), result.size() + 1, 0,
-               (struct sockaddr *) &clientAddress,
-               sizeof(clientAddress)) < 0)
-      cerr << "Émission du message modifié impossible\n";
-  }
+    cout << "Attente de requete sur le port " << listenPort << "\n";
+
+    while (1) {
+
+        clientAddressLength = sizeof (clientAddress);
+
+        // Mise Ã  zÃ©ro du tampon de facon de connaitre le dÃ©limiteur
+        // de fin de chaine.
+        memset(msg, 0x0, MSG_ARRAY_SIZE);
+
+        int nbReceivedByte = recvfrom(listenSocket, msg, MSG_ARRAY_SIZE, 0, (struct sockaddr *) &clientAddress, &clientAddressLength);
+
+        if (nbReceivedByte < 0) {
+            cerr << "  ProblÃ¨me de rÃ©ception du messsage\n";
+            exit(1);
+        } else {
+            msg[nbReceivedByte + 1] = '\0';
+        }
+
+        // Affichage de l'adresse IP du client.
+        cout << "  Depuis " << inet_ntoa(clientAddress.sin_addr);
+
+        // Affichage du numÃ©ro de port du client.
+        cout << ":" << ntohs(clientAddress.sin_port) << "\n";
+
+        // Affichage de la ligne reÃ§ue
+        cout << "  Message reÃ§u : " << msg << "\n";
+
+        string result;
+        string sMsg(msg);
+        treatCommand(sMsg, result);
+
+        // Renvoi de la ligne convertie au client.
+        if (sendto(listenSocket, result.c_str(), result.size() + 1, 0,
+                (struct sockaddr *) &clientAddress,
+                sizeof (clientAddress)) < 0)
+            cerr << "Emission du message modifiÃ© impossible\n";
+    }
 }

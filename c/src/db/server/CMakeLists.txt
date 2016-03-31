@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.2)
+
+PROJECT(server)
+
+#if you don't want the full compiler output, remove the following line
+SET(CMAKE_VERBOSE_MAKEFILE ON)
+
+SET(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_CXX_STANDARD_REQUIRED on)
+
+SET(CMAKE_CXX_FLAGS ${DEFINITIONS_CXXFLAGS})
+
+INCLUDE_DIRECTORIES(../common)
+
+#list all source files here
+AUX_SOURCE_DIRECTORY(. SERVER_SRC_FILES_CPP)
+AUX_SOURCE_DIRECTORY(../common COMMON2_SRC_FILES_CPP)
+ADD_EXECUTABLE(server ${SERVER_SRC_FILES_CPP} ${COMMON2_SRC_FILES_CPP})
