@@ -21,6 +21,10 @@
 #include <list>
 #include <vector>
 
+#if NUMBER_OF_THREADS > 1
+#include <atomic>
+#endif
+
 #include "typedefinition.h"
 
 #include "mastergame.h"
@@ -84,7 +88,7 @@ namespace mastermind {
         void updateFromIterationMT_emit(const Combinaison &guessComb) noexcept;
         void updateFromIterationMT_init() noexcept;
         void updateFromIterationMT_end(Combinaison &nextPatternCombi) noexcept;
-        void* updateFromIterationWT(void *t) noexcept;
+        void* updateFromIterationWT(U32 id) noexcept;
 #endif
 
         friend ostream& operator<<(ostream& os, const MasterSolver& masterSolver) noexcept {
@@ -127,26 +131,13 @@ namespace mastermind {
 
         bool m_MTthreadExit[NUMBER_OF_THREADS];
 
-        U32 m_MTactivityCounter;
-        pthread_mutex_t MTactivityCounter_mutex;
+        std::atomic<U32> m_MTactivityCounter = {0};
 
-#define ACTIVITY_COUNTER_INC(id) pthread_mutex_lock (&MTactivityCounter_mutex);\
-		/*D_BEGIN cerr << id <<" # Line A:" << __LINE__ << endl; D_END*/\
-		m_MTactivityCounter++;\
-		/*D_BEGIN cerr << id <<" # Line B:" << __LINE__ << "INC ActivityCounter: " << m_MTactivityCounter <<endl; D_END*/\
-		pthread_mutex_unlock (&MTactivityCounter_mutex);
+#define ACTIVITY_COUNTER_INC() m_MTactivityCounter++;
 
-#define ACTIVITY_COUNTER_DEC(id) pthread_mutex_lock (&MTactivityCounter_mutex);\
-		/*D_BEGIN cerr << id <<" # Line A:" << __LINE__ << endl; D_END*/\
-		m_MTactivityCounter--;\
-		/*D_BEGIN cerr << id <<" # Line B:" << __LINE__ << "DEC ActivityCounter: " << m_MTactivityCounter <<endl; D_END*/\
-		pthread_mutex_unlock (&MTactivityCounter_mutex);
+#define ACTIVITY_COUNTER_DEC() m_MTactivityCounter--;
 
-#define ACTIVITY_COUNTER_GET(GetVariable)  pthread_mutex_lock (&MTactivityCounter_mutex);\
-		/*D_BEGIN cerr << "MT # Line A:" << __LINE__ << endl; D_END*/\
-		GetVariable = m_MTactivityCounter;\
-		pthread_mutex_unlock (&MTactivityCounter_mutex);\
-		/*D_BEGIN cerr << "MT # Line B:" << __LINE__ << "GET ActivityCounter: " << GetVariable <<endl; D_END*/
+#define ACTIVITY_COUNTER_GET() m_MTactivityCounter.load();
 
         static void* thread_fun(void* args) noexcept;
 

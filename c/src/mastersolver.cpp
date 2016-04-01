@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <vector>
 
 #include "mastersolver.h"
 #include "combinaison.h"
@@ -116,22 +117,21 @@ namespace mastermind {
     }
 
     U32 MasterSolver::estimationForFirstPattern() noexcept {
-        U32 * pColorCountTable = new U32[m_nbColors];
-        U32 * pDuplicates = new U32[m_nbPositions];
+        vector<U32> colorCountTable(m_nbColors, 0);
+        vector<U32> duplicates(m_nbPositions, 0);
 
-        memset(pDuplicates, 0, m_nbPositions * sizeof (U32));
         for (U32 indexCombi = 0; indexCombi < ITERATION_FOR_DUPLICATION_SIMULATION; indexCombi++) {
-            memset(pColorCountTable, 0, m_nbColors * sizeof (U32));
+            colorCountTable.assign(colorCountTable.size(), 0);
             for (U32 indexElement = 0; indexElement < m_nbPositions; indexElement++) {
-                pColorCountTable[rand() % m_nbColors]++;
+                colorCountTable[rand() % m_nbColors]++;
             }
             U32 max = 0;
             for (U32 indexColor = 0; indexColor < m_nbColors; indexColor++) {
-                if (pColorCountTable[indexColor] > max) {
-                    max = pColorCountTable[indexColor];
+                if (colorCountTable[indexColor] > max) {
+                    max = colorCountTable[indexColor];
                 }
             }
-            pDuplicates[max - 1]++;
+            duplicates[max - 1]++;
         }
 
         U32 indexOfMaxDuplicate = 0;
@@ -140,10 +140,10 @@ namespace mastermind {
 #endif
         for (U32 max = 0, indexElement = 0; indexElement < m_nbPositions; indexElement++) {
 #ifndef NO_RESULT_OUTPUT
-            cout << pDuplicates[indexElement];
+            cout << duplicates[indexElement];
 #endif
-            if (pDuplicates[indexElement] > max) {
-                max = pDuplicates[indexElement];
+            if (duplicates[indexElement] > max) {
+                max = duplicates[indexElement];
                 indexOfMaxDuplicate = indexElement;
             }
 #ifndef NO_RESULT_OUTPUT
@@ -154,9 +154,6 @@ namespace mastermind {
 #ifndef NO_RESULT_OUTPUT
         cout << "]=" << indexOfMaxDuplicate + 1 << "\n";
 #endif
-        delete[] pColorCountTable;
-        delete[] pDuplicates;
-
         return indexOfMaxDuplicate + 1;
     }
 
@@ -192,8 +189,8 @@ namespace mastermind {
             //cout << "Incremental Research\n";
             for (; m_indexPastGuessSetTreated < m_pastGuessSet.size(); m_indexPastGuessSetTreated++) {
                 getCorrectionOfSecretCombinaison(m_pastGuessSet[m_indexPastGuessSetTreated], blackPigs, whitePigs); //OK with guessesCombinaisons
+                tScore score = {blackPigs, whitePigs};
                 for (listCombinaison::iterator itorOnSol = m_possibleSolutionSet.begin(); itorOnSol != m_possibleSolutionSet.end();) {
-                    tScore score = {blackPigs, whitePigs};
                     if (!isCombiCompatible(m_pastGuessSet[m_indexPastGuessSetTreated], *itorOnSol, score))
                         itorOnSol = m_possibleSolutionSet.erase(itorOnSol);
                     else
@@ -257,8 +254,7 @@ namespace mastermind {
             m_MTthreadExit[t] = true;
         }
 
-        m_MTactivityCounter = 0;
-        pthread_mutex_init(&MTactivityCounter_mutex, nullptr);
+        m_MTactivityCounter.store(0);
 
 #ifdef __DEBUG__
         pthread_mutex_init(&MT_DEBUG_mutex, nullptr);
@@ -303,8 +299,6 @@ namespace mastermind {
 
         pthread_mutex_destroy(&MTmaximumGuessScore_mutex);
         pthread_cond_destroy(&MTmaximumGuessScore_cond);
-
-        pthread_mutex_destroy(&MTactivityCounter_mutex);
     }
 
     void MasterSolver::updateFromIterationMT_init() noexcept {
@@ -370,10 +364,10 @@ namespace mastermind {
 
         ///////////////////////////////////////////////////////////////
         //D_BEGIN cerr << "MT # Line :" << __LINE__ << endl; D_END
-        pthread_mutex_lock(&MTcomb_mutex);
+        //pthread_mutex_lock(&MTcomb_mutex);
         //check that all threads have finished their work
-        ACTIVITY_COUNTER_GET(numberOfActiveThread);
-        pthread_mutex_unlock(&MTcomb_mutex);
+        numberOfActiveThread = ACTIVITY_COUNTER_GET();
+        //pthread_mutex_unlock(&MTcomb_mutex);
 
         while (numberOfActiveThread > 0) {
             pthread_mutex_lock(&MTmaximumGuessScore_mutex);
@@ -389,7 +383,7 @@ namespace mastermind {
 
             //pthread_mutex_lock (&MTcomb_mutex);
             //check that all threads have finished their work
-            ACTIVITY_COUNTER_GET(numberOfActiveThread);
+            numberOfActiveThread = ACTIVITY_COUNTER_GET();
             //pthread_mutex_unlock (&MTcomb_mutex);
 
             lossOfTimeB++;
@@ -402,13 +396,12 @@ namespace mastermind {
 
     void* MasterSolver::thread_fun(void* args) noexcept {
         thread_fun_args *tfArgs = static_cast<thread_fun_args*> (args);
-        void* ret = tfArgs->This->updateFromIterationWT(reinterpret_cast<void *> (tfArgs->Id));
+        void* ret = tfArgs->This->updateFromIterationWT(tfArgs->Id);
         delete tfArgs;
         return ret;
     }
 
-    void* MasterSolver::updateFromIterationWT(void *t) noexcept {
-        U32 id = reinterpret_cast<U32> (t);
+    void* MasterSolver::updateFromIterationWT(U32 id) noexcept {
         //D_BEGIN cerr << id << " # updateFromIterationWT" << endl; D_END
         vectorCombinaison vectComb;
         //D_BEGIN cerr << id << " # Before While" << endl; D_END
@@ -420,7 +413,7 @@ namespace mastermind {
                 pthread_cond_wait(&MTcomb_cond, &MTcomb_mutex);
                 //D_BEGIN cerr << id << " # AFTER pthread_cond_wait(&MTcomb_cond, &MTcomb_mutex);" << endl; D_END
             }//otherwise, the signal is already sent, so don't wait for a signal that has been already sent (and "lost")
-            ACTIVITY_COUNTER_INC(id)
+            ACTIVITY_COUNTER_INC()
             //D_BEGIN cerr << id << " # number of comb inputs [" << m_MTvectorComb.size() << "]" << endl; D_END
             U32 vectorSize = m_MTvectorComb.size();
             //U32 NbIteration = mMin(vectorSize, MAX_COMB_BY_THREAD);
@@ -442,11 +435,11 @@ namespace mastermind {
 
             U32 thisScore = 0;
             Combinaison guessComb;
-            for (vectorCombinaison::iterator itorVectComb = vectComb.begin(); itorVectComb != vectComb.end(); ++itorVectComb) {
-                U32 localScore = testCurrentPattern(*itorVectComb);
+            for (const auto& combinaison : vectComb) {
+                U32 localScore = testCurrentPattern(combinaison);
                 if (localScore > thisScore) {
                     thisScore = localScore;
-                    guessComb = *itorVectComb;
+                    guessComb = combinaison;
                 }
                 //D_BEGIN cerr << id ; D_END
             }
@@ -464,7 +457,7 @@ namespace mastermind {
             //D_BEGIN cerr << id << " # Line :" << __LINE__ << endl; D_END
             m_MTSignalStateMaximumGuessScore++;
             pthread_cond_signal(&MTmaximumGuessScore_cond);
-            ACTIVITY_COUNTER_DEC(id)
+            ACTIVITY_COUNTER_DEC()
             //D_BEGIN cerr << id << " # Line :" << __LINE__ << " / " << m_MTSignalStateMaximumGuessScore << endl; D_END
             pthread_mutex_unlock(&MTmaximumGuessScore_mutex);
         }
